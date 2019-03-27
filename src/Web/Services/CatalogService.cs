@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.eShopWeb.ApplicationCore.Entities;
+using Microsoft.eShopWeb.ApplicationCore.Interfaces;
+using Microsoft.eShopWeb.ApplicationCore.Specifications;
+using Microsoft.eShopWeb.Web.ViewModels;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.eShopWeb.Web.ViewModels;
-using Microsoft.eShopWeb.ApplicationCore.Entities;
-using Microsoft.Extensions.Logging;
-using Microsoft.eShopWeb.ApplicationCore.Interfaces;
-using System;
-using Microsoft.eShopWeb.ApplicationCore.Specifications;
 
 namespace Microsoft.eShopWeb.Web.Services
 {
@@ -18,14 +18,14 @@ namespace Microsoft.eShopWeb.Web.Services
     public class CatalogService : ICatalogService
     {
         private readonly ILogger<CatalogService> _logger;
-        private readonly IRepository<CatalogItem> _itemRepository;
+        private readonly IAsyncRepository<CatalogItem> _itemRepository;
         private readonly IAsyncRepository<CatalogBrand> _brandRepository;
         private readonly IAsyncRepository<CatalogType> _typeRepository;
         private readonly IUriComposer _uriComposer;
 
         public CatalogService(
             ILoggerFactory loggerFactory,
-            IRepository<CatalogItem> itemRepository,
+            IAsyncRepository<CatalogItem> itemRepository,
             IAsyncRepository<CatalogBrand> brandRepository,
             IAsyncRepository<CatalogType> typeRepository,
             IUriComposer uriComposer)
@@ -42,19 +42,17 @@ namespace Microsoft.eShopWeb.Web.Services
             _logger.LogInformation("GetCatalogItems called.");
 
             var filterSpecification = new CatalogFilterSpecification(brandId, typeId);
-            var root = _itemRepository.List(filterSpecification);
+            var filterPaginatedSpecification =
+                new CatalogFilterPaginatedSpecification(itemsPage * pageIndex, itemsPage, brandId, typeId);
 
-            var totalItems = root.Count();
+            // the implementation below using ForEach and Count. We need a List.
+            var itemsOnPage = await _itemRepository.ListAsync(filterPaginatedSpecification);
+            var totalItems = await _itemRepository.CountAsync(filterSpecification);
 
-            var itemsOnPage = root
-                .Skip(itemsPage * pageIndex)
-                .Take(itemsPage)
-                .ToList();
-
-            itemsOnPage.ForEach(x =>
+            foreach (var itemOnPage in itemsOnPage)
             {
-                x.PictureUri = _uriComposer.ComposePicUri(x.PictureUri);
-            });
+                itemOnPage.PictureUri = _uriComposer.ComposePicUri(itemOnPage.PictureUri);
+            }
 
             var vm = new CatalogIndexViewModel()
             {
