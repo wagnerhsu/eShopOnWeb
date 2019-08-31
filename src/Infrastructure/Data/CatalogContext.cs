@@ -23,6 +23,14 @@ namespace Microsoft.eShopWeb.Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            //Intentionally rolling back this change to fix issue: https://github.com/dotnet-architecture/eShopOnWeb/issues/292
+            //Will follow up after issue has been resolved.
+            //base.OnModelCreating(builder);
+            //builder.ApplyAllConfigurationsFromCurrentAssembly();
+
+            // alternately this is built-in to EF Core 2.2
+            //builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
             builder.Entity<Basket>(ConfigureBasket);
             builder.Entity<CatalogBrand>(ConfigureCatalogBrand);
             builder.Entity<CatalogType>(ConfigureCatalogType);
