@@ -45,12 +45,12 @@ namespace Microsoft.eShopWeb.Web
             if (Configuration.GetValue<bool>("UseInMemoryDatabase"))
             {
                 // use in-memory database
-            //ConfigureInMemoryDatabases(services);
+                ConfigureInMemoryDatabases(services);
             }
             else
             {
                 // use real database
-            ConfigureProductionServices(services);
+                ConfigureProductionServices(services);
             }
         }
 
@@ -96,12 +96,10 @@ namespace Microsoft.eShopWeb.Web
             ConfigureInMemoryDatabases(services);
         }
 
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCookieSettings();
-
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
@@ -133,7 +131,6 @@ namespace Microsoft.eShopWeb.Web
             {
                 options.Conventions.Add(new RouteTokenTransformerConvention(
                          new SlugifyParameterTransformer()));
-
             });
             services.AddControllersWithViews();
             services.AddRazorPages(options =>
@@ -149,7 +146,6 @@ namespace Microsoft.eShopWeb.Web
                 config.Path = "/allservices";
             });
 
-            
             var baseUrlConfig = new BaseUrlConfiguration();
             Configuration.Bind(BaseUrlConfiguration.CONFIG_NAME, baseUrlConfig);
             services.AddScoped<BaseUrlConfiguration>(sp => baseUrlConfig);
@@ -170,7 +166,6 @@ namespace Microsoft.eShopWeb.Web
 
             _services = services; // used to debug registered services
         }
-
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -196,7 +191,7 @@ namespace Microsoft.eShopWeb.Web
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseShowAllServicesMiddleware();                                
+                app.UseShowAllServicesMiddleware();
                 app.UseMigrationsEndPoint();
                 app.UseWebAssemblyDebugging();
             }
@@ -226,7 +221,5 @@ namespace Microsoft.eShopWeb.Web
                 endpoints.MapFallbackToFile("index.html");
             });
         }
-
     }
-
 }
