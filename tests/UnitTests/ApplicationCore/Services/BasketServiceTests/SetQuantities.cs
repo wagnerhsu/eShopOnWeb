@@ -1,11 +1,11 @@
-﻿using Microsoft.eShopWeb.ApplicationCore.Exceptions;
+﻿using Microsoft.eShopWeb.ApplicationCore.Entities.BasketAggregate;
+using Microsoft.eShopWeb.ApplicationCore.Exceptions;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Microsoft.eShopWeb.ApplicationCore.Services;
-using Microsoft.eShopWeb.ApplicationCore.Entities.BasketAggregate;
 using Moq;
 using System;
-using Xunit;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace Microsoft.eShopWeb.UnitTests.ApplicationCore.Services.BasketServiceTests
 {
@@ -36,6 +36,5 @@ namespace Microsoft.eShopWeb.UnitTests.ApplicationCore.Services.BasketServiceTes
             await Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await basketService.SetQuantities(123, null));
         }
-
     }
 }
